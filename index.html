@@ -145,7 +145,8 @@
 
         <div class="form-group">
             <label class="optional">その他ご要望 (氏名・年齢・性別など)</label>
-            <textarea id="requests" rows="3" placeholder="ご自由にご記入ください"></textarea>
+            <textarea id="requests" rows="3"
+            placeholder="例：夜勤なし／土日休み／残業少なめ／通勤30分以内／ブランク2年 など"></textarea>
         </div>
 
         <div class="form-group">
@@ -164,7 +165,7 @@
                 <div id="err-phoneNumber" class="error-message"></div>
             </div>
             <div class="form-group">
-                <label class="required">ご希望の時間帯</label>
+                <label class="optional">ご希望の時間帯</label>
                 <select id="callTime">
                     <option value="">選択してください</option>
                     <option value="午前中">午前中</option>
@@ -228,10 +229,6 @@
             } else if (!/^(0[5-9]0[0-9]{8}|0[1-9][0-9]{8,9})$/.test(phone)) {
                 phoneErr.innerText = "※正しいお電話番号を入力してください";
                 phoneErr.style.display = 'block';
-                hasError = true;
-            }
-            if (!document.getElementById('callTime').value) {
-                document.getElementById('err-callTime').style.display = 'block';
                 hasError = true;
             }
         }
