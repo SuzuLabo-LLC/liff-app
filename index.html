@@ -120,15 +120,17 @@
         </div>
 
         <div class="form-group">
-            <label class="optional">経験年数</label>
-            <select id="experience">
-                <option value="">選択してください</option>
-                <option value="1-2年">1-2年</option>
-                <option value="3-5年">3-5年</option>
-                <option value="6-10年">6-10年</option>
-                <option value="10年以上">10年以上</option>
-            </select>
-        </div>
+  <label class="required">経験年数</label>
+  <select id="experience" required>
+      <option value="">選択してください</option>
+      <option value="1-2年">1-2年</option>
+      <option value="3-5年">3-5年</option>
+      <option value="6-10年">6-10年</option>
+      <option value="10年以上">10年以上</option>
+  </select>
+  <div id="err-experience" class="error-message">※経験年数を選択してください</div>
+</div>
+
 
         <div class="form-group">
             <label class="optional">求職期間</label>
@@ -189,7 +191,7 @@
 <div id="success-screen">
     <h2>受付を完了いたしました</h2>
     <p>ご回答ありがとうございます。<br>
-       内容を確認の上、担当者よりLINEにてご連絡いたします。<br>
+       内容を確認の上、担当者よりご連絡いたします。<br>
        今しばらくお待ちくださいませ。</p>
     <button onclick="liff.closeWindow()">画面を閉じる</button>
 </div>
@@ -240,6 +242,10 @@
         if (getCheckedValues('location').length === 0) { document.getElementById('err-location').style.display = 'block'; hasError = true; }
         if (getCheckedValues('jobDetail').length === 0) { document.getElementById('err-jobDetail').style.display = 'block'; hasError = true; }
 
+        // 経験年数（必須）
+        if (!document.getElementById('experience').value) { document.getElementById('err-experience').style.display = 'block'; hasError = true; }
+
+        
         if (hasError) {
             window.scrollTo({top: 0, behavior: 'smooth'});
             return;
