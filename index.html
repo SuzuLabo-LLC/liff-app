@@ -252,7 +252,7 @@
         btn.disabled = true;
         btn.innerText = "送信中...";
 
-        // --- 【今回の修正】選択されていない方のデータを空にする ---
+        // --- 選択されていない方のデータを空にする ---
         let finalPhone = document.getElementById('phoneNumber').value;
         let finalCallTime = document.getElementById('callTime').value;
         let finalLineReq = document.getElementById('lineRequests').value;
@@ -264,8 +264,18 @@
             finalLineReq = "";
         }
 
+        // 【変更点】LINEプロフィール（ユーザー名）を取得
+        let displayName = "";
+        try {
+            const profile = await liff.getProfile();
+            displayName = profile.displayName;
+        } catch (e) {
+            console.error("プロフィール取得エラー:", e);
+        }
+
         const formData = {
             userId: liff.getDecodedIDToken().sub,
+            displayName: displayName,
             answers: {
                 job: getCheckedValues('job'),
                 facilityType: getCheckedValues('facilityType'),
