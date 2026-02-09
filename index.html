@@ -1,321 +1,303 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>求職者希望条件入力フォーム</title>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <style>
-    :root {
-      --line-color: #06C755;
-      --error-color: #ff3b30;
-      --optional-color: #888;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>求職者希望条件入力フォーム</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        :root {
+            --line-color: #06C755;
+            --error-color: #ff3b30;
+            --optional-color: #888;
+        }
 
-    body { font-family: sans-serif; padding: 20px; background-color: #f8f9fa; color: #333; line-height: 1.6; }
-    h2 { font-size: 18px; border-left: 5px solid var(--line-color); padding-left: 10px; margin-bottom: 20px; text-align: center; }
-    .form-group { margin-bottom: 25px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        body { font-family: sans-serif; padding: 20px; background-color: #f8f9fa; color: #333; line-height: 1.6; }
+        h2 { font-size: 18px; border-left: 5px solid var(--line-color); padding-left: 10px; margin-bottom: 20px; text-align: center; }
+        .form-group { margin-bottom: 25px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-    label { display: block; font-weight: bold; margin-bottom: 12px; font-size: 15px; }
-    .required::after { content: " *必須"; color: var(--error-color); font-size: 12px; margin-left: 5px; }
-    .optional::after { content: " *任意"; color: var(--optional-color); font-size: 12px; margin-left: 5px; }
+        label { display: block; font-weight: bold; margin-bottom: 12px; font-size: 15px; }
+        .required::after { content: " *必須"; color: var(--error-color); font-size: 12px; margin-left: 5px; }
+        .optional::after { content: " *任意"; color: var(--optional-color); font-size: 12px; margin-left: 5px; }
 
-    .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
-    .checkbox-item { display: flex; align-items: center; background: #eee; padding: 8px 12px; border-radius: 20px; font-size: 14px; cursor: pointer; }
-    .checkbox-item:has(input:checked) { background: var(--line-color); color: white; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .checkbox-item { display: flex; align-items: center; background: #eee; padding: 8px 12px; border-radius: 20px; font-size: 14px; cursor: pointer; }
+        .checkbox-item:has(input:checked) { background: var(--line-color); color: white; }
+        
+        .radio-group { display: flex; gap: 20px; }
+        .radio-item { display: flex; align-items: center; cursor: pointer; }
 
-    .radio-group { display: flex; gap: 20px; }
-    .radio-item { display: flex; align-items: center; cursor: pointer; }
+        input[type="text"], input[type="tel"], select, textarea {
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px;
+        }
 
-    input[type="text"], input[type="tel"], select, textarea {
-      width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px;
-    }
+        .error-message { color: var(--error-color); font-size: 13px; margin-top: 8px; display: none; font-weight: bold; }
 
-    .error-message { color: var(--error-color); font-size: 13px; margin-top: 8px; display: none; font-weight: bold; }
+        button { width: 100%; padding: 16px; background-color: var(--line-color); color: white; border: none; border-radius: 30px; font-size: 17px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:disabled { background-color: #ccc; }
 
-    button { width: 100%; padding: 16px; background-color: var(--line-color); color: white; border: none; border-radius: 30px; font-size: 17px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-    button:disabled { background-color: #ccc; }
+        #success-screen { display: none; text-align: center; padding: 40px 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        #success-screen h2 { border: none; font-size: 22px; margin-bottom: 20px; }
+        #success-screen p { font-size: 16px; color: #555; margin-bottom: 30px; }
 
-    #success-screen { display: none; text-align: center; padding: 40px 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    #success-screen h2 { border: none; font-size: 22px; margin-bottom: 20px; }
-    #success-screen p { font-size: 16px; color: #555; margin-bottom: 30px; }
-
-    #global-error {
-      display: none;
-      background-color: #fff2f2;
-      color: var(--error-color);
-      border: 1px solid var(--error-color);
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-weight: bold;
-      text-align: center;
-    }
-  </style>
+        #global-error {
+            display: none;
+            background-color: #fff2f2;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 
 <div id="form-container">
-  <h2>希望条件入力</h2>
+    <h2>希望条件入力</h2>
 
-  <div id="global-error">
-    ！ 送信に失敗しました。<br>
-    電波の良いところで再度お試しください。
-  </div>
-
-  <div id="form">
-    <div class="form-group">
-      <label class="required">希望職種 (複数選択可)</label>
-      <div class="checkbox-group">
-        <label class="checkbox-item"><input type="checkbox" name="job" value="看護師">看護師</label>
-        <label class="checkbox-item"><input type="checkbox" name="job" value="准看護師">准看護師</label>
-        <label class="checkbox-item"><input type="checkbox" name="job" value="介護職">介護職</label>
-        <label class="checkbox-item"><input type="checkbox" name="job" value="介護福祉士">介護福祉士</label>
-      </div>
-      <div id="err-job" class="error-message">※ご希望の職種を1つ以上選択してください</div>
+    <div id="global-error">
+        ！ 送信に失敗しました。<br>
+        電波の良いところで再度お試しください。
     </div>
 
-    <div class="form-group">
-      <label class="required">施設の種類 (複数選択可)</label>
-      <div class="checkbox-group">
-        <label class="checkbox-item"><input type="checkbox" name="facilityType" value="病院">病院</label>
-        <label class="checkbox-item"><input type="checkbox" name="facilityType" value="介護施設">介護施設</label>
-      </div>
-      <div id="err-facilityType" class="error-message">※ご希望の施設形態を1つ以上選択してください</div>
-    </div>
+    <div id="form">
+        <div class="form-group">
+            <label class="required">希望職種 (複数選択可)</label>
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" name="job" value="看護師">看護師</label>
+                <label class="checkbox-item"><input type="checkbox" name="job" value="准看護師">准看護師</label>
+                <label class="checkbox-item"><input type="checkbox" name="job" value="介護職">介護職</label>
+                <label class="checkbox-item"><input type="checkbox" name="job" value="介護福祉士">介護福祉士</label>
+            </div>
+            <div id="err-job" class="error-message">※ご希望の職種を1つ以上選択してください</div>
+        </div>
 
-    <div class="form-group">
-      <label class="required">希望勤務地 (複数選択可)</label>
-      <div class="checkbox-group">
-        <label class="checkbox-item"><input type="checkbox" name="location" value="北区">北区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="中央区">中央区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="西区">西区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="手稲区">手稲区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="東区">東区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="厚別区">厚別区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="白石区">白石区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="南区">南区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="豊平区">豊平区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="清田区">清田区</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="江別市">江別市</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="岩見沢市">岩見沢市</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="北広島市">北広島市</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="恵庭市">恵庭市</label>
-        <label class="checkbox-item"><input type="checkbox" name="location" value="千歳市">千歳市</label>
-      </div>
-      <div id="err-location" class="error-message">※ご希望の勤務地を1つ以上選択してください</div>
-    </div>
+        <div class="form-group">
+            <label class="required">施設の種類 (複数選択可)</label>
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" name="facilityType" value="病院">病院</label>
+                <label class="checkbox-item"><input type="checkbox" name="facilityType" value="介護施設">介護施設</label>
+            </div>
+            <div id="err-facilityType" class="error-message">※ご希望の施設形態を1つ以上選択してください</div>
+        </div>
 
-    <div class="form-group">
-      <label class="required">仕事内容 (複数選択可)</label>
-      <div class="checkbox-group">
-        <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="急性">急性</label>
-        <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="療養">療養</label>
-        <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="訪問介護">訪問介護</label>
-        <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="訪問看護">訪問看護</label>
-        <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="訪問診療">訪問診療</label>
-        <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="精神科">精神科</label>
-      </div>
-      <div id="err-jobDetail" class="error-message">※ご希望の仕事内容を1つ以上選択してください</div>
-    </div>
+        <div class="form-group">
+            <label class="required">希望勤務地 (複数選択可)</label>
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" name="location" value="北区">北区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="中央区">中央区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="西区">西区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="手稲区">手稲区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="東区">東区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="厚別区">厚別区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="白石区">白石区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="南区">南区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="豊平区">豊平区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="清田区">清田区</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="江別市">江別市</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="岩見沢市">岩見沢市</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="北広島市">北広島市</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="恵庭市">恵庭市</label>
+                <label class="checkbox-item"><input type="checkbox" name="location" value="千歳市">千歳市</label>
+            </div>
+            <div id="err-location" class="error-message">※ご希望の勤務地を1つ以上選択してください</div>
+        </div>
 
-    <!-- 経験年数：任意 -->
-    <div class="form-group">
-      <label class="optional">経験年数</label>
-      <select id="experience">
-        <option value="">選択してください</option>
-        <option value="1-2年">1-2年</option>
-        <option value="3-5年">3-5年</option>
-        <option value="6-10年">6-10年</option>
-        <option value="10年以上">10年以上</option>
-      </select>
-      <div id="err-experience" class="error-message">※経験年数を選択してください</div>
-    </div>
+        <div class="form-group">
+            <label class="required">仕事内容 (複数選択可)</label>
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="急性">急性</label>
+                <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="療養">療養</label>
+                <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="訪問介護">訪問介護</label>
+                <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="訪問看護">訪問看護</label>
+                <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="訪問診療">訪問診療</label>
+                <label class="checkbox-item"><input type="checkbox" name="jobDetail" value="精神科">精神科</label>
+            </div>
+            <div id="err-jobDetail" class="error-message">※ご希望の仕事内容を1つ以上選択してください</div>
+        </div>
 
-    <div class="form-group">
-      <label class="optional">求職期間</label>
-      <select id="period">
-        <option value="">選択してください</option>
-        <option value="すぐにでも">すぐにでも</option>
-        <option value="1か月以内">1か月以内</option>
-        <option value="2か月以内">2か月以内</option>
-        <option value="ゆっくり探す">ゆっくり探す</option>
-      </select>
-    </div>
+        <div class="form-group">
+            <label class="optional">経験年数</label>
+            <select id="experience">
+                <option value="">選択してください</option>
+                <option value="1-2年">1-2年</option>
+                <option value="3-5年">3-5年</option>
+                <option value="6-10年">6-10年</option>
+                <option value="10年以上">10年以上</option>
+            </select>
+        </div>
 
-    <div class="form-group">
-      <label class="optional">その他ご要望 (氏名・年齢・性別など)</label>
-      <textarea id="requests" rows="3" placeholder="ご自由にご記入ください"></textarea>
-    </div>
+        <div class="form-group">
+            <label class="optional">求職期間</label>
+            <select id="period">
+                <option value="">選択してください</option>
+                <option value="すぐにでも">すぐにでも</option>
+                <option value="1か月以内">1か月以内</option>
+                <option value="2か月以内">2か月以内</option>
+                <option value="ゆっくり探す">ゆっくり探す</option>
+            </select>
+        </div>
 
-    <div class="form-group">
-      <label class="required">ご希望の連絡方法</label>
-      <div class="radio-group">
-        <label class="radio-item"><input type="radio" name="contactMethod" value="電話" onchange="toggleContactFields()">電話</label>
-        <label class="radio-item"><input type="radio" name="contactMethod" value="LINE" onchange="toggleContactFields()">LINE</label>
-      </div>
-      <div id="err-contactMethod" class="error-message">※ご希望の連絡方法を選択してください</div>
-    </div>
+        <div class="form-group">
+            <label class="optional">その他ご要望 (氏名・年齢・性別など)</label>
+            <textarea id="requests" rows="3" placeholder="ご自由にご記入ください"></textarea>
+        </div>
 
-    <div id="phoneFields" style="display: none;">
-      <div class="form-group">
-        <label class="required">電話番号 (ハイフンなし/半角数字)</label>
-        <input type="tel" id="phoneNumber" placeholder="例：09012345678">
-        <div id="err-phoneNumber" class="error-message"></div>
-      </div>
-      <div class="form-group">
-        <label class="required">ご希望の時間帯</label>
-        <select id="callTime">
-          <option value="">選択してください</option>
-          <option value="午前中">午前中</option>
-          <option value="12時〜14時">12時〜14時</option>
-          <option value="14時〜16時">14時〜16時</option>
-          <option value="16時〜18時">16時〜18時</option>
-          <option value="18時以降">18時以降</option>
-        </select>
-        <div id="err-callTime" class="error-message">※お電話可能な時間帯を選択してください</div>
-      </div>
-    </div>
+        <div class="form-group">
+            <label class="required">ご希望の連絡方法</label>
+            <div class="radio-group">
+                <label class="radio-item"><input type="radio" name="contactMethod" value="電話" onchange="toggleContactFields()">電話</label>
+                <label class="radio-item"><input type="radio" name="contactMethod" value="LINE" onchange="toggleContactFields()">LINE</label>
+            </div>
+            <div id="err-contactMethod" class="error-message">※ご希望の連絡方法を選択してください</div>
+        </div>
 
-    <div id="lineFields" style="display: none;">
-      <div class="form-group">
-        <label class="optional">LINE連絡に関する要望</label>
-        <textarea id="lineRequests" rows="2" placeholder="例：19時以降にメッセージが欲しい等"></textarea>
-      </div>
-    </div>
+        <div id="phoneFields" style="display: none;">
+            <div class="form-group">
+                <label class="required">電話番号 (ハイフンなし/半角数字)</label>
+                <input type="tel" id="phoneNumber" placeholder="例：09012345678">
+                <div id="err-phoneNumber" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label class="required">ご希望の時間帯</label>
+                <select id="callTime">
+                    <option value="">選択してください</option>
+                    <option value="午前中">午前中</option>
+                    <option value="12時〜14時">12時〜14時</option>
+                    <option value="14時〜16時">14時〜16時</option>
+                    <option value="16時〜18時">16時〜18時</option>
+                    <option value="18時以降">18時以降</option>
+                </select>
+                <div id="err-callTime" class="error-message">※お電話可能な時間帯を選択してください</div>
+            </div>
+        </div>
 
-    <button id="submitBtn" onclick="validateAndSubmit()">内容を送信する</button>
-  </div>
+        <div id="lineFields" style="display: none;">
+            <div class="form-group">
+                <label class="optional">LINE連絡に関する要望</label>
+                <textarea id="lineRequests" rows="2" placeholder="例：19時以降にメッセージが欲しい等"></textarea>
+            </div>
+        </div>
+
+        <button id="submitBtn" onclick="validateAndSubmit()">内容を送信する</button>
+    </div>
 </div>
 
 <div id="success-screen">
-  <h2>受付を完了いたしました</h2>
-  <p>ご回答ありがとうございます。<br>
-     内容を確認の上、担当者よりLINEにてご連絡いたします。<br>
-     今しばらくお待ちくださいませ。</p>
-  <button onclick="liff.closeWindow()">画面を閉じる</button>
+    <h2>受付を完了いたしました</h2>
+    <p>ご回答ありがとうございます。<br>
+       内容を確認の上、担当者よりLINEにてご連絡いたします。<br>
+       今しばらくお待ちくださいませ。</p>
+    <button onclick="liff.closeWindow()">画面を閉じる</button>
 </div>
 
 <script>
-  // ====== ここで固定：任意Ver ======
-  const EXPERIENCE_REQUIRED = false;
+    // ▼▼▼ 設定エリア ▼▼▼
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwQLaP5wUcIP8wmgUZUTjHxhC7Z0VrGlGqrdart-eFDd2aA0dOAKMsK2XvTwSOB37ih/exec";
+    const LIFF_ID = "2008958710-9RaI0D7V";
+    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-  liff.init({ liffId: "2008958710-9RaI0D7V" }).then(() => {
-    if (!liff.isLoggedIn()) { liff.login(); }
-  });
+    liff.init({ liffId: LIFF_ID }).then(() => {
+        if (!liff.isLoggedIn()) { liff.login(); }
+    });
 
-  function toggleContactFields() {
-    const method = document.querySelector('input[name="contactMethod"]:checked')?.value;
-    document.getElementById('phoneFields').style.display = method === '電話' ? 'block' : 'none';
-    document.getElementById('lineFields').style.display = method === 'LINE' ? 'block' : 'none';
-  }
-
-  async function validateAndSubmit() {
-    let hasError = false;
-    document.querySelectorAll('.error-message').forEach(e => e.style.display = 'none');
-    document.getElementById('global-error').style.display = 'none';
-
-    const getCheckedValues = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value);
-
-    const method = document.querySelector('input[name="contactMethod"]:checked')?.value;
-    if (!method) {
-      document.getElementById('err-contactMethod').style.display = 'block';
-      hasError = true;
-    } else if (method === '電話') {
-      const phone = document.getElementById('phoneNumber').value;
-      const phoneErr = document.getElementById('err-phoneNumber');
-      if (!phone) {
-        phoneErr.innerText = "※お電話番号を入力してください";
-        phoneErr.style.display = 'block';
-        hasError = true;
-      } else if (!/^(0[5-9]0[0-9]{8}|0[1-9][0-9]{8,9})$/.test(phone)) {
-        phoneErr.innerText = "※正しいお電話番号を入力してください";
-        phoneErr.style.display = 'block';
-        hasError = true;
-      }
-      if (!document.getElementById('callTime').value) {
-        document.getElementById('err-callTime').style.display = 'block';
-        hasError = true;
-      }
+    function toggleContactFields() {
+        const method = document.querySelector('input[name="contactMethod"]:checked')?.value;
+        document.getElementById('phoneFields').style.display = method === '電話' ? 'block' : 'none';
+        document.getElementById('lineFields').style.display = method === 'LINE' ? 'block' : 'none';
     }
 
-    // 基本必須項目
-    if (getCheckedValues('job').length === 0) { document.getElementById('err-job').style.display = 'block'; hasError = true; }
-    if (getCheckedValues('facilityType').length === 0) { document.getElementById('err-facilityType').style.display = 'block'; hasError = true; }
-    if (getCheckedValues('location').length === 0) { document.getElementById('err-location').style.display = 'block'; hasError = true; }
-    if (getCheckedValues('jobDetail').length === 0) { document.getElementById('err-jobDetail').style.display = 'block'; hasError = true; }
+    async function validateAndSubmit() {
+        let hasError = false;
+        document.querySelectorAll('.error-message').forEach(e => e.style.display = 'none');
+        document.getElementById('global-error').style.display = 'none';
 
-    // 経験年数：任意Verなのでチェックしない
-    if (EXPERIENCE_REQUIRED && !document.getElementById('experience').value) {
-      document.getElementById('err-experience').style.display = 'block';
-      hasError = true;
+        const getCheckedValues = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value);
+
+        const method = document.querySelector('input[name="contactMethod"]:checked')?.value;
+        if (!method) {
+            document.getElementById('err-contactMethod').style.display = 'block';
+            hasError = true;
+        } else if (method === '電話') {
+            const phone = document.getElementById('phoneNumber').value;
+            const phoneErr = document.getElementById('err-phoneNumber');
+            if (!phone) {
+                phoneErr.innerText = "※お電話番号を入力してください";
+                phoneErr.style.display = 'block';
+                hasError = true;
+            } else if (!/^(0[5-9]0[0-9]{8}|0[1-9][0-9]{8,9})$/.test(phone)) {
+                phoneErr.innerText = "※正しいお電話番号を入力してください";
+                phoneErr.style.display = 'block';
+                hasError = true;
+            }
+            if (!document.getElementById('callTime').value) {
+                document.getElementById('err-callTime').style.display = 'block';
+                hasError = true;
+            }
+        }
+
+        // 基本必須項目のバリデーション
+        if (getCheckedValues('job').length === 0) { document.getElementById('err-job').style.display = 'block'; hasError = true; }
+        if (getCheckedValues('facilityType').length === 0) { document.getElementById('err-facilityType').style.display = 'block'; hasError = true; }
+        if (getCheckedValues('location').length === 0) { document.getElementById('err-location').style.display = 'block'; hasError = true; }
+        if (getCheckedValues('jobDetail').length === 0) { document.getElementById('err-jobDetail').style.display = 'block'; hasError = true; }
+
+        if (hasError) {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "送信中...";
+
+        let finalPhone = document.getElementById('phoneNumber').value;
+        let finalCallTime = document.getElementById('callTime').value;
+        let finalLineReq = document.getElementById('lineRequests').value;
+
+        if (method === 'LINE') {
+            finalPhone = "";
+            finalCallTime = "";
+        } else {
+            finalLineReq = "";
+        }
+
+        const idToken = liff.getDecodedIDToken();
+
+        const formData = {
+            userId: idToken.sub,
+            displayName: idToken.name,
+            answers: {
+                job: getCheckedValues('job'),
+                facilityType: getCheckedValues('facilityType'),
+                location: getCheckedValues('location'),
+                jobDetail: getCheckedValues('jobDetail'),
+                experience: document.getElementById('experience').value,
+                period: document.getElementById('period').value,
+                requests: document.getElementById('requests').value,
+                contactMethod: method,
+                phoneNumber: finalPhone,
+                callTime: finalCallTime,
+                lineRequests: finalLineReq
+            }
+        };
+
+        try {
+            await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(formData) });
+
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        } catch (error) {
+            document.getElementById('global-error').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            btn.disabled = false;
+            btn.innerText = "内容を送信する";
+        }
     }
-
-    if (hasError) {
-      window.scrollTo({top: 0, behavior: 'smooth'});
-      return;
-    }
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerText = "送信中...";
-
-    // 未選択側のデータを空にする
-    let finalPhone = document.getElementById('phoneNumber').value;
-    let finalCallTime = document.getElementById('callTime').value;
-    let finalLineReq = document.getElementById('lineRequests').value;
-
-    if (method === 'LINE') {
-      finalPhone = "";
-      finalCallTime = "";
-    } else {
-      finalLineReq = "";
-    }
-
-    // displayName取得
-    let displayName = "";
-    try {
-      const profile = await liff.getProfile();
-      displayName = profile?.displayName || "";
-    } catch (e) {
-      displayName = "";
-    }
-
-    const idToken = liff.getDecodedIDToken();
-    const userId = idToken?.sub;
-
-    const formData = {
-      userId: userId,
-      displayName: displayName, // ★GASへ送る
-      answers: {
-        job: getCheckedValues('job'),
-        facilityType: getCheckedValues('facilityType'),
-        location: getCheckedValues('location'),
-        jobDetail: getCheckedValues('jobDetail'),
-        experience: document.getElementById('experience').value,
-        period: document.getElementById('period').value,
-        requests: document.getElementById('requests').value,
-        contactMethod: method,
-        phoneNumber: finalPhone,
-        callTime: finalCallTime,
-        lineRequests: finalLineReq
-      }
-    };
-
-    try {
-      const gasUrl = "https://script.google.com/macros/s/AKfycbwQLaP5wUcIP8wmgUZUTjHxhC7Z0VrGlGqrdart-eFDd2aA0dOAKMsK2XvTwSOB37ih/exec";
-      await fetch(gasUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(formData) });
-
-      document.getElementById('form-container').style.display = 'none';
-      document.getElementById('success-screen').style.display = 'block';
-      window.scrollTo({top: 0, behavior: 'smooth'});
-    } catch (error) {
-      document.getElementById('global-error').style.display = 'block';
-      window.scrollTo({top: 0, behavior: 'smooth'});
-      btn.disabled = false;
-      btn.innerText = "内容を送信する";
-    }
-  }
 </script>
 </body>
 </html>
