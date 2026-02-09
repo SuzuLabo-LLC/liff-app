@@ -119,17 +119,17 @@
             <div id="err-jobDetail" class="error-message">※ご希望の仕事内容を1つ以上選択してください</div>
         </div>
 
-<div class="form-group">
-  <label class="optional">経験年数</label>
-  <select id="experience">
-    <option value="">選択してください</option>
-    <option value="1-2年">1-2年</option>
-    <option value="3-5年">3-5年</option>
-    <option value="6-10年">6-10年</option>
-    <option value="10年以上">10年以上</option>
-  </select>
-</div>
-
+        <!-- ★ここ：経験年数（任意） -->
+        <div class="form-group">
+            <label class="optional">経験年数</label>
+            <select id="experience">
+                <option value="">選択してください</option>
+                <option value="1-2年">1-2年</option>
+                <option value="3-5年">3-5年</option>
+                <option value="6-10年">6-10年</option>
+                <option value="10年以上">10年以上</option>
+            </select>
+        </div>
 
         <div class="form-group">
             <label class="optional">求職期間</label>
@@ -144,8 +144,7 @@
 
         <div class="form-group">
             <label class="optional">その他ご要望 (氏名・年齢・性別など)</label>
-            <textarea id="requests" rows="3"
-            placeholder="例：夜勤なし／土日休み／残業少なめ／通勤30分以内／ブランク2年 など"></textarea>
+            <textarea id="requests" rows="3" placeholder="ご自由にご記入ください"></textarea>
         </div>
 
         <div class="form-group">
@@ -164,7 +163,7 @@
                 <div id="err-phoneNumber" class="error-message"></div>
             </div>
             <div class="form-group">
-                <label class="optional">ご希望の時間帯</label>
+                <label class="required">ご希望の時間帯</label>
                 <select id="callTime">
                     <option value="">選択してください</option>
                     <option value="午前中">午前中</option>
@@ -191,7 +190,7 @@
 <div id="success-screen">
     <h2>受付を完了いたしました</h2>
     <p>ご回答ありがとうございます。<br>
-       内容を確認の上、担当者よりご連絡いたします。<br>
+       内容を確認の上、担当者よりLINEにてご連絡いたします。<br>
        今しばらくお待ちくださいませ。</p>
     <button onclick="liff.closeWindow()">画面を閉じる</button>
 </div>
@@ -230,6 +229,10 @@
                 phoneErr.style.display = 'block';
                 hasError = true;
             }
+            if (!document.getElementById('callTime').value) {
+                document.getElementById('err-callTime').style.display = 'block';
+                hasError = true;
+            }
         }
 
         // 基本必須項目のバリデーション
@@ -238,10 +241,6 @@
         if (getCheckedValues('location').length === 0) { document.getElementById('err-location').style.display = 'block'; hasError = true; }
         if (getCheckedValues('jobDetail').length === 0) { document.getElementById('err-jobDetail').style.display = 'block'; hasError = true; }
 
-        // 経験年数（必須）
-        if (!document.getElementById('experience').value) { document.getElementById('err-experience').style.display = 'block'; hasError = true; }
-
-        
         if (hasError) {
             window.scrollTo({top: 0, behavior: 'smooth'});
             return;
@@ -251,7 +250,7 @@
         btn.disabled = true;
         btn.innerText = "送信中...";
 
-        // --- 選択されていない方のデータを空にする ---
+        // --- 【今回の修正】選択されていない方のデータを空にする ---
         let finalPhone = document.getElementById('phoneNumber').value;
         let finalCallTime = document.getElementById('callTime').value;
         let finalLineReq = document.getElementById('lineRequests').value;
@@ -263,18 +262,8 @@
             finalLineReq = "";
         }
 
-        // 【変更点】LINEプロフィール（ユーザー名）を取得
-        let displayName = "";
-        try {
-            const profile = await liff.getProfile();
-            displayName = profile.displayName;
-        } catch (e) {
-            console.error("プロフィール取得エラー:", e);
-        }
-
         const formData = {
             userId: liff.getDecodedIDToken().sub,
-            displayName: displayName,
             answers: {
                 job: getCheckedValues('job'),
                 facilityType: getCheckedValues('facilityType'),
@@ -291,9 +280,9 @@
         };
 
         try {
-            const gasUrl = "https://script.google.com/macros/s/AKfycbwQLaP5wUcIP8wmgUZUTjHxhC7Z0VrGlGqrdart-eFDd2aA0dOAKMsK2XvTwSOB37ih/exec"; 
+            const gasUrl = "https://script.google.com/macros/s/AKfycbwQLaP5wUcIP8wmgUZUTjHxhC7Z0VrGlGqrdart-eFDd2aA0dOAKMsK2XvTwSOB37ih/exec";
             await fetch(gasUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(formData) });
-            
+
             document.getElementById('form-container').style.display = 'none';
             document.getElementById('success-screen').style.display = 'block';
             window.scrollTo({top: 0, behavior: 'smooth'});
